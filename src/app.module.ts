@@ -9,6 +9,7 @@ import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
 import { WorkspacesModule } from './workspaces/workspaces.module';
 import { CollectionsModule } from './collections/collections.module';
+import { BookmarksModule } from './bookmarks/bookmarks.module';
 
 
 @Module({
@@ -41,6 +42,8 @@ import { CollectionsModule } from './collections/collections.module';
     WorkspacesModule,
 
     CollectionsModule,
+
+    BookmarksModule,
   ],
 })
 export class AppModule { }

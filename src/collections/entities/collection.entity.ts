@@ -1,5 +1,6 @@
+import { Bookmark } from 'src/bookmarks/entities/bookmark.entity';
 import { Workspace } from 'src/workspaces/entities/workspace.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('collections')
 export class Collection {
@@ -22,4 +23,11 @@ export class Collection {
         { onDelete: 'CASCADE' }
     )
     workspace: Workspace;
+
+    @OneToMany(
+        () => Bookmark,
+        (bookmark) => bookmark.collection,
+        { cascade: true, eager: true }
+    )
+    bookmarks: Bookmark[];
 }
