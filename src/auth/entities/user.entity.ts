@@ -1,4 +1,4 @@
-import { Product } from "src/products/entities/product.entity";
+import { Workspace } from "src/workspaces/entities/workspace.entity";
 import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity("users")
@@ -25,15 +25,19 @@ export class User {
     })
     isActive: boolean;
 
+
     @Column('text', {
         array: true,
         default: ['user']
     })
     roles: string[];
 
-    @OneToMany(() => Product, (product) => product.user)
-    product: Product
-
+    @OneToMany(
+        () => Workspace,
+        (workspace) => workspace.user,
+        { cascade: true }
+    )
+    workspace: Workspace[];
 
     @BeforeInsert()
     checkEmailFieldBeforeInsert() {
@@ -44,5 +48,4 @@ export class User {
     checkEmailFieldBeforeUpdate() {
         this.checkEmailFieldBeforeInsert()
     }
-
 }
