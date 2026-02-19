@@ -69,7 +69,7 @@ export class CollectionsService {
   }
 
   async update(id: string, updateCollectionDto: UpdateCollectionDto, user: User) {
-    const collection = await this.findOne(id, user); // Seguridad primero
+    const collection = await this.findOne(id, user); // Seguridad: Primero verifica que sea tuyo
     try {
       this.collectionRepository.merge(collection, updateCollectionDto);
       return await this.collectionRepository.save(collection);
@@ -77,9 +77,8 @@ export class CollectionsService {
       this.handleDBExceptions(error);
     }
   }
-
   async remove(id: string, user: User) {
-    const collection = await this.findOne(id, user);
+    const collection = await this.findOne(id, user); // Seguridad: Primero verifica que sea tuyo
     await this.collectionRepository.remove(collection);
     return { message: 'Collection deleted successfully' };
   }

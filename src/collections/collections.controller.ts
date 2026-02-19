@@ -39,12 +39,11 @@ export class CollectionsController {
   @Patch(':id')
   update(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateCollectionDto: UpdateCollectionDto,
+    @Body() updateCollectionDto: UpdateCollectionDto, // Asegúrate de que este DTO existe y es un PartialType
     @GetUser() user: User
   ) {
     return this.collectionsService.update(id, updateCollectionDto, user);
   }
-
   @Delete(':id')
   remove(
     @Param('id', ParseUUIDPipe) id: string,
