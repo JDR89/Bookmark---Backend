@@ -32,6 +32,22 @@ export class AuthController {
     return this.authService.checkAuthStatus(user);
   }
 
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  async googleAuth(@Req() req) {
+    // Este código nunca se ejecuta directamente, AuthGuard('google')
+    // se encarga de redirigir al usuario a la página de Google.
+  }
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  async googleAuthRedirect(@Req() req: any) {
+    // Cuando Google nos devuelve aquí, el AuthGuard ya hizo su trabajo con la strategy
+    // y nos dejó los datos del usuario listos en 'req.user'
+
+    // Le pasamos estos datos a nuestro servicio para que los guarde en BD y genere el JWT
+    return this.authService.googleLogin(req.user);
+  }
+
   @Get("private")
   @UseGuards(AuthGuard())
   testingPrivateRoute(

@@ -13,9 +13,10 @@ export class User {
     email: string;
 
     @Column('text', {
-        select: false
+        select: false,
+        nullable: true
     })
-    password: string;
+    password?: string;
 
     @Column('text')
     fullName: string;
@@ -25,12 +26,17 @@ export class User {
     })
     isActive: boolean;
 
-
     @Column('text', {
         array: true,
         default: ['user']
     })
     roles: string[];
+
+    @Column('text', {
+        nullable: true,
+        unique: true
+    })
+    googleId?: string;
 
     @OneToMany(
         () => Workspace,
