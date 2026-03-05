@@ -1,16 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/auth/entities/user.entity';
+import { Workspace } from 'src/workspaces/entities/workspace.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { initialData } from './data/seed-data'; // <--- Importante: necesitas re-importar esto
+import { initialData } from './data/seed-data';
 
 @Injectable()
 export class SeedService {
 
   constructor(
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>
+    private readonly userRepository: Repository<User>,
+    @InjectRepository(Workspace)
+    private readonly workspaceRepository: Repository<Workspace>,
   ) { }
 
   async runSeed() {
@@ -20,7 +23,12 @@ export class SeedService {
   }
 
   private async deleteTables() {
-    // Borramos todos los usuarios
+    const workspaceQueryBuilder = this.workspaceRepository.createQueryBuilder();
+    await workspaceQueryBuilder
+      .delete()
+      .where({})
+      .execute();
+
     const queryBuilder = this.userRepository.createQueryBuilder();
     await queryBuilder
       .delete()
@@ -29,7 +37,7 @@ export class SeedService {
   }
 
   private async insertNewUsers() {
-    const seedUsers = initialData.users; // Aquí usamos la data inicial
+    const seedUsers = initialData.users;
 
     const users: User[] = seedUsers.map(user => this.userRepository.create({
       ...user,

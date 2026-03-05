@@ -24,4 +24,8 @@ export class CreateBookmarkDto {
     @IsBoolean()
     @IsOptional()
     isFavorite?: boolean;
+
+    @IsString()
+    @IsOptional()
+    status?: string;
 }

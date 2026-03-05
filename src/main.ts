@@ -16,9 +16,16 @@ async function bootstrap() {
     })
   );
 
+  //TODO: CAMBIAR EL ORIGEN PARA PRODUCCION
+  app.enableCors({
+    origin: 'http://localhost:3000',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+  });
+
   const config = new DocumentBuilder()
-    .setTitle('Teslo RESTfull API')
-    .setDescription('The Teslo Shop API endpoints')
+    .setTitle('Bookmark API')
+    .setDescription('The Bookmark API endpoints')
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);

@@ -27,7 +27,7 @@ import { GoogleStrategy } from './strategies/google.strategy';
         return {
           secret: configService.get('JWT_SECRET'),
           signOptions: {
-            expiresIn: "24h"
+            expiresIn: "7d"
           }
         }
       }

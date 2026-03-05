@@ -1,16 +1,13 @@
-import { Controller, Get, Post, Body, UseGuards, Req, Headers, SetMetadata } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Req, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { createUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from './decorators/get-user.decorator';
 import { User } from './entities/user.entity';
-import { RawHeaders } from './decorators/raw-headers.decorator';
-import * as http from 'http';
-import { UserRoleGuard } from './guards/user-role/user-role.guard';
-import { RoleProtected } from './decorators/role-protected.decorator';
-import { ValidRoles } from './interfaces/valid-roles';
+
 import { Auth } from './decorators/auth.decorator';
+import type { Response } from 'express'
 
 @Controller('auth')
 export class AuthController {
@@ -38,65 +35,17 @@ export class AuthController {
     // Este código nunca se ejecuta directamente, AuthGuard('google')
     // se encarga de redirigir al usuario a la página de Google.
   }
+
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
-  async googleAuthRedirect(@Req() req: any) {
-    // Cuando Google nos devuelve aquí, el AuthGuard ya hizo su trabajo con la strategy
-    // y nos dejó los datos del usuario listos en 'req.user'
+  async googleAuthRedirect(@Req() req: any, @Res() res: Response) {
+    // Generamos el token usando el servicio actual
+    const { token } = await this.authService.googleLogin(req.user);
 
-    // Le pasamos estos datos a nuestro servicio para que los guarde en BD y genere el JWT
-    return this.authService.googleLogin(req.user);
+    // Redirigimos al frontend pasándole el token en la URL
+    // Cambiá el puerto 3000 si tu frontend corre en otro
+    res.redirect(`http://localhost:3000/bookmarks?token=${token}`);
   }
 
-  @Get("private")
-  @UseGuards(AuthGuard())
-  testingPrivateRoute(
-    @Req() req: Express.Request,
-    @GetUser() user: User,
-    @GetUser("email") userEmail: string,
-
-    @RawHeaders("rawHeaders") rawHeaders: string[],
-    @Headers() headers: http.IncomingHttpHeaders
-
-  ) {
-
-    return {
-      ok: true,
-      message: "Hola mundo privado",
-      user,
-      userEmail,
-      rawHeaders,
-      headers
-    }
-  }
-
-
-  @Get("private2")
-  @RoleProtected(ValidRoles.admin, ValidRoles.superUser)
-  @UseGuards(AuthGuard(), UserRoleGuard)
-  privateRoute2(
-    @GetUser() user: User,
-  ) {
-
-    return {
-      ok: true,
-      user
-
-    }
-  }
-
-
-  @Get("private3")
-  @Auth(ValidRoles.admin)
-  privateRoute3(
-    @GetUser() user: User,
-  ) {
-
-    return {
-      ok: true,
-      user
-
-    }
-  }
 
 }
