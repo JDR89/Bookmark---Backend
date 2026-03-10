@@ -8,10 +8,13 @@ import { User } from './entities/user.entity';
 
 import { Auth } from './decorators/auth.decorator';
 import type { Response } from 'express'
+import { ConfigService } from '@nestjs/config';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService,
+    private readonly configService: ConfigService
+  ) { }
 
   @Post("register")
   create(@Body() createUserDto: createUserDto) {
@@ -44,7 +47,7 @@ export class AuthController {
 
     // Redirigimos al frontend pasándole el token en la URL
     // Cambiá el puerto 3000 si tu frontend corre en otro
-    res.redirect(`http://localhost:3000/bookmarks?token=${token}`);
+    res.redirect(`${this.configService.get('FRONTEND_URL')}/bookmarks?token=${token}`);
   }
 
 
