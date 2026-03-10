@@ -20,7 +20,7 @@ import { BookmarksModule } from './bookmarks/bookmarks.module';
       type: 'postgres',
       url: process.env.DATABASE_URL,
       autoLoadEntities: true,
-      synchronize: true, // Activado temporalmente para MVP de Producción
+      synchronize: process.env.NODE_ENV !== 'production',
     }),
 
     ServeStaticModule.forRoot({
