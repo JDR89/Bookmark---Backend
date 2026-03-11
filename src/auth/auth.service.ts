@@ -7,6 +7,9 @@ import * as bcrypt from 'bcrypt';
 import { LoginUserDto } from './dto/login-user.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { JwtService } from '@nestjs/jwt';
+import { WorkspacesService } from 'src/workspaces/workspaces.service';
+import { CollectionsService } from 'src/collections/collections.service';
+import { BookmarksService } from 'src/bookmarks/bookmarks.service';
 
 @Injectable()
 export class AuthService {
@@ -14,7 +17,10 @@ export class AuthService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
+    private readonly workspacesService: WorkspacesService,
+    private readonly collectionsService: CollectionsService,
+    private readonly bookmarksService: BookmarksService,
   ) { }
 
   async create(createUserDto: createUserDto) {
@@ -30,6 +36,8 @@ export class AuthService {
       });
 
       await this.userRepository.save(user);
+
+      await this.runOnboardingForNewUser(user);
 
       const { password: _, ...userWithoutPassword } = user;
 
@@ -104,6 +112,8 @@ export class AuthService {
         // El password no se manda, y como hicimos nullable: true, está todo ok.
       });
       await this.userRepository.save(user);
+
+      await this.runOnboardingForNewUser(user);
     }
     // 3. Si SÍ existe, pero es la primera vez que entra con Google, 
     // actualizamos su googleId (opcional pero muy útil)
@@ -132,6 +142,40 @@ export class AuthService {
       throw new InternalServerErrorException(error.detail);
     }
     throw error;
+  }
+
+  private async runOnboardingForNewUser(user: User) {
+    try {
+      // 1. Crear el Workspace
+      const defaultWorkspace = await this.workspacesService.create({
+        name: 'Personal',
+        // Asegúrate de pasar los campos exactos que pide tu CreateWorkspaceDto
+      }, user);
+      // 2. Crear las Colecciones vinculadas al Workspace
+      const collection1 = await this.collectionsService.create({
+        name: 'Read',
+        workspaceId: defaultWorkspace!.id, // Verifica el nombre exacto de la property
+        // Asegúrate de pasar los campos exactos que pide tu CreateCollectionDto
+      }, user);
+      const collection2 = await this.collectionsService.create({
+        name: 'Inspiration',
+        workspaceId: defaultWorkspace!.id,
+      }, user);
+      // 3. Crear los Bookmarks vinculados a cada Colección
+      await this.bookmarksService.create({
+        title: '¡Aprende NestJS!',
+        url: 'https://docs.nestjs.com/',
+        collectionId: collection1!.id,
+      }, user);
+      await this.bookmarksService.create({
+        title: 'Documentación MDN',
+        url: 'https://developer.mozilla.org/',
+        collectionId: collection2!.id,
+      }, user);
+    } catch (error) {
+      // Registrar el error pero no detener el registro del usuario si el onboarding falla por algo
+      console.error('Error durante la creación del contenido de Onboarding:', error);
+    }
   }
 
 }

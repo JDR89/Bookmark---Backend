@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { BookmarksService } from './bookmarks.service';
 import { BookmarksController } from './bookmarks.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -9,9 +9,10 @@ import { AuthModule } from 'src/auth/auth.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Bookmark, Collection]),
-    AuthModule
+    forwardRef(() => AuthModule)
   ],
   controllers: [BookmarksController],
   providers: [BookmarksService],
+  exports: [BookmarksService]
 })
 export class BookmarksModule { }

@@ -11,5 +11,6 @@ import { Workspace } from 'src/workspaces/entities/workspace.entity';
   ],
   controllers: [CollectionsController],
   providers: [CollectionsService],
+  exports: [CollectionsService]
 })
 export class CollectionsModule { }
