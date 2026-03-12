@@ -49,6 +49,12 @@ Antes de clonar el proyecto, asegúrate de tener instalado:
    - Llena los valores de acuerdo a tu entorno local (Base de datos, secretos, puertos, etc.).
    *Nota: Para desarrollo local, asegúrate de mantener `NODE_ENV=development` para que TypeORM genere las tablas automáticamente.*
 
+4. **Levantar la Base de Datos Local con Docker:**
+   - Si tienes [Docker](https://www.docker.com/) instalado, puedes levantar la base de datos de PostgreSQL usando el archivo `docker-compose.yaml` (esto creará un contenedor llamado `bookmark-db` mapeando el puerto 5432):
+   ```bash
+   docker-compose up -d
+   ```
+
 ## 🏃‍♂️ Ejecutando la Aplicación
 
 ```bash
